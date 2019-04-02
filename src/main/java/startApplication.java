@@ -16,6 +16,7 @@ public class startApplication {
 
 
     public static void main(String[] args) {
+        // test
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup(2);
         try {
