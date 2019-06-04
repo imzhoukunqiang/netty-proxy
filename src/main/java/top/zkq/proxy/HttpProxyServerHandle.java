@@ -1,11 +1,11 @@
-package proxy;
+package top.zkq.proxy;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 
 /**
- * Project <netty-proxy>
+ * Project <netty-top.zkq.proxy>
  * Created by smm on 2019/2/11 11:15.
  */
 public class HttpProxyServerHandle extends ChannelInboundHandlerAdapter {
@@ -45,6 +45,7 @@ public class HttpProxyServerHandle extends ChannelInboundHandlerAdapter {
 
             ChannelFuture cf = bootstrap.connect(temp[0], port);
             cf.addListener(new ChannelFutureListener() {
+                @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         future.channel().writeAndFlush(msg);
@@ -75,6 +76,7 @@ public class HttpProxyServerHandle extends ChannelInboundHandlerAdapter {
                         });
                 cf = bootstrap.connect(host, port);
                 cf.addListener(new ChannelFutureListener() {
+                    @Override
                     public void operationComplete(ChannelFuture future) throws Exception {
                         if (future.isSuccess()) {
                             future.channel().writeAndFlush(msg);

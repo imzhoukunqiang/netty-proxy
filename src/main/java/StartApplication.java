@@ -6,16 +6,17 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import proxy.HttpProxyServerHandle;
+import top.zkq.proxy.HttpProxyServerHandle;
 
 /**
- * Project <netty-proxy>
+ * Project <netty-top.zkq.proxy>
  * Created by smm on 2019/1/10 17:20.
  */
-public class startApplication {
+public class StartApplication {
 
 
     public static void main(String[] args) {
+
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup(2);
         try {

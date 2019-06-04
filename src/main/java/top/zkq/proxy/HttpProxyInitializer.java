@@ -1,4 +1,4 @@
-package proxy;
+package top.zkq.proxy;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -6,7 +6,7 @@ import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 
 /**
- * Project <netty-proxy>
+ * Project <netty-top.zkq.proxy>
  * Created by smm on 2019/2/11 11:18.
  */
 public class HttpProxyInitializer extends ChannelInitializer {
