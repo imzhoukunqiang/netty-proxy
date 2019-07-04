@@ -29,6 +29,11 @@ public class DyMap implements DyData {
     }
 
     @Override
+    public String toString() {
+        return data.toString();
+    }
+
+    @Override
     public DyData getDyData(String key) {
         Object o = data.get(key);
         if (o == null) {

@@ -7,16 +7,16 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.concurrent.ScheduledFuture;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.zkq.douyu.client.codec.DyMessageDecoder;
-import top.zkq.douyu.client.entity.DyMap;
-import top.zkq.douyu.client.entity.DyMessage;
+import top.zkq.douyu.client.handler.FristConnectedHandler;
+import top.zkq.douyu.client.handler.HeartbeatHandler;
+import top.zkq.douyu.client.handler.MsgLogHandler;
 import top.zkq.douyu.client.handler.PrintMessageHandler;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author zkq
@@ -30,7 +30,7 @@ public class Client {
         String roomId = "9999";
         Bootstrap bootstrap = new Bootstrap();
         NioEventLoopGroup group = new NioEventLoopGroup(1);
-
+        Channel channel = null;
         try {
             ChannelFuture future = bootstrap.group(group)
                                             .channel(NioSocketChannel.class)
@@ -39,38 +39,26 @@ public class Client {
                                                 @Override
                                                 protected void initChannel(Channel ch) throws Exception {
                                                     ChannelPipeline pipeline = ch.pipeline();
+                                                    pipeline.addLast(new IdleStateHandler(0, 30, 0));
                                                     pipeline.addLast(new DyMessageDecoder());
+                                                    pipeline.addLast(new MsgLogHandler());
                                                     pipeline.addLast(new PrintMessageHandler());
+                                                    pipeline.addLast(new HeartbeatHandler());
+                                                    pipeline.addLast(new FristConnectedHandler(roomId));
                                                     LOGGER.info("connected to DouYu.");
                                                 }
                                             })
                                             .connect();
-            Channel channel = future.sync().channel();
-            DyMap map = new DyMap();
-            map.put("type", "loginreq");
-            map.put("roomid", roomId);
-            channel.writeAndFlush(new DyMessage(DyMessage.REQUEST, map)).sync();
+            channel = future.sync().channel();
 
-            ScheduledFuture<?> schedule = group.scheduleWithFixedDelay(() -> {
-                DyMap d = new DyMap();
-                d.put("type", "keeplive");
-                d.put("tick", String.valueOf(System.currentTimeMillis()));
-                channel.writeAndFlush(new DyMessage(DyMessage.REQUEST, d));
-            }, 0, 30, TimeUnit.SECONDS);
-
-            Thread.sleep(1000);
-            map = new DyMap();
-            map.put("type", "joingroup");
-            map.put("rid", roomId);
-            map.put("gid", "-9999");
-            channel.writeAndFlush(new DyMessage(DyMessage.REQUEST, map));
-
-
-            channel.closeFuture().addListener(f -> {
-                schedule.cancel(true);
-            }).sync();
         } finally {
-            group.shutdownGracefully().sync();
+            if (channel != null) {
+                channel.closeFuture().addListener(f -> {
+                    group.shutdownGracefully();
+                });
+            } else {
+                group.shutdownGracefully();
+            }
         }
 
     }
