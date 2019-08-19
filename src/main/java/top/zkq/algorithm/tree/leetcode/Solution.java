@@ -89,4 +89,33 @@ class Solution {
         }
         return constans(root.left, node) || constans(root.right, node);
     }
+
+
+
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        LinkedList<List<Integer>> list = new LinkedList<>();
+        if (root == null) {
+            return list;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            ArrayList<Integer> l = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode n = queue.poll();
+                if (n.left != null) {
+                    queue.add(n.left);
+                }
+                if (n.right != null) {
+                    queue.add(n.right);
+                }
+                l.add(n.val);
+            }
+            list.addFirst(l);
+        }
+        return list;
+    }
+
+
 }

@@ -119,11 +119,15 @@
         </logger>
         <!--建立一个默认的root的logger-->
         <root level="${output_log_level}">
+<!--
             <appender-ref ref="RollingFile"/>
+-->
             <appender-ref ref="Console"/>
+<!--
             <appender-ref ref="InfoFile"/>
             <appender-ref ref="WarnFile"/>
             <appender-ref ref="ErrorFile"/>
+-->
         </root>
     </loggers>
 </configuration>

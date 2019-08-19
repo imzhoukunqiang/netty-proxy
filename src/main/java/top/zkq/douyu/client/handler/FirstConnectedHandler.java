@@ -15,12 +15,12 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0
  * @date 2019/7/4 16:15
  */
-public class FristConnectedHandler extends ChannelInboundHandlerAdapter {
+public class FirstConnectedHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FristConnectedHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FirstConnectedHandler.class);
     private final String roomId;
 
-    public FristConnectedHandler(String roomId) {
+    public FirstConnectedHandler(String roomId) {
         this.roomId = roomId;
     }
 

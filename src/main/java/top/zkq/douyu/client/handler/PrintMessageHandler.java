@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import top.zkq.douyu.client.entity.DyData;
 import top.zkq.douyu.client.entity.DyMessage;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.MessageFormat;
@@ -26,8 +24,8 @@ public class PrintMessageHandler extends SimpleChannelInboundHandler<DyMessage> 
 
     public Writer writer;
 
-    public PrintMessageHandler() throws IOException {
-        writer = new BufferedWriter(new FileWriter("D:\\data\\弹幕.txt"));
+    public PrintMessageHandler(Writer writer) throws IOException {
+        this.writer = writer;
     }
 
     @Override
@@ -40,21 +38,13 @@ public class PrintMessageHandler extends SimpleChannelInboundHandler<DyMessage> 
             String txt = data.getString("txt");
             String bnn = data.getString("bnn");
             String format = MessageFormat.format("[{0} {1}] [lv.{2} {3}] {4}", uid, nn, level, bnn, txt);
-            writer.write(format);
-            writer.write('\n');
+            writer.append(format);
+            writer.append(System.lineSeparator());
             LOGGER.info(format);
         } else {
             //    System.out.println(data.encode());
         }
     }
 
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        try {
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        super.channelUnregistered(ctx);
-    }
+
 }
