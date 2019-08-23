@@ -1,5 +1,6 @@
 package top.zkq.douyu.client;
 
+import com.google.common.base.Charsets;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -17,9 +18,7 @@ import top.zkq.douyu.client.handler.HeartbeatHandler;
 import top.zkq.douyu.client.handler.MsgLogHandler;
 import top.zkq.douyu.client.handler.PrintMessageHandler;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -40,9 +39,8 @@ public class Client {
     public Client(String roomId) throws IOException {
         this.roomId = roomId;
         group = new NioEventLoopGroup(1);
-        writer = new BufferedWriter(new FileWriter(
-                "D:\\data\\弹幕.txt",
-                true), 128);
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream("D:\\data\\弹幕.txt", true), Charsets.UTF_8);
+        writer = new BufferedWriter(out, 128);
         bootstrap = new Bootstrap().group(group)
                                    .channel(NioSocketChannel.class)
                                    .remoteAddress(new InetSocketAddress("openbarrage.douyutv.com", 8601))
@@ -73,14 +71,20 @@ public class Client {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOGGER.info("正在退出....");
             Client.this.close();
+            LOGGER.info("退出....");
         }));
     }
 
     public void close() {
         closed = true;
-        channel.close();
+        try {
+            channel.close().sync();
+            writer.flush();
+            Commons.close(writer);
+        } catch (Exception e) {
+
+        }
         group.shutdownGracefully();
-        Commons.close(writer);
     }
 
     private void doConnect() {

@@ -1,5 +1,6 @@
 package top.zkq.douyu.client.handler;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -46,5 +47,10 @@ public class PrintMessageHandler extends SimpleChannelInboundHandler<DyMessage> 
         }
     }
 
-
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        Channel channel = ctx.channel();
+        LOGGER.error(channel.id() + " 发生异常 :" + cause.getMessage(), cause);
+        channel.close();
+    }
 }
