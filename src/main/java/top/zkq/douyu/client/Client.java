@@ -67,7 +67,7 @@ public class Client {
     }
 
     public void start() {
-        doConnect();
+        doConnect(0);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOGGER.info("正在退出....");
             Client.this.close();
@@ -87,30 +87,33 @@ public class Client {
         group.shutdownGracefully();
     }
 
-    private void doConnect() {
+    private void doConnect(long delay) {
         if (channel != null && channel.isActive() && !closed) {
             return;
         }
-
-        LOGGER.info("try connect.");
         try {
-            ChannelFuture future = bootstrap.connect();
-            future.addListener(f -> {
-                if (!f.isSuccess()) {
-                    TimeUnit.SECONDS.sleep(1);
-                    doConnect();
-                }
-            });
-
-            this.channel = future.sync().channel();
-
-            channel.closeFuture().addListener(f -> {
-                TimeUnit.SECONDS.sleep(1);
-                doConnect();
-            });
-        } catch (InterruptedException ignore) {
-
+            TimeUnit.MILLISECONDS.sleep(delay);
+        } catch (InterruptedException ignored) {
+            //不会发生
         }
+        LOGGER.info("try connect.");
+        ChannelFuture connect = bootstrap.connect();
+        connect.addListener(f -> {
+            if (!f.isSuccess()) {
+                doConnect(1000);
+            } else {
+                Channel channel = connect.channel();
+                updateChannel(channel);
+                channel.closeFuture().addListener(f1 -> {
+                    doConnect(1000);
+                });
+            }
+        });
+
+    }
+
+    private void updateChannel(Channel channel) {
+        this.channel = channel;
     }
 
 }
