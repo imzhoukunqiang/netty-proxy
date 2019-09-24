@@ -39,7 +39,7 @@ public class Client {
     public Client(String roomId) throws IOException {
         this.roomId = roomId;
         group = new NioEventLoopGroup(1);
-        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream("D:\\data\\弹幕.txt", true), Charsets.UTF_8);
+        OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream("弹幕.txt", true), Charsets.UTF_8);
         writer = new BufferedWriter(out, 128);
         bootstrap = new Bootstrap().group(group)
                                    .channel(NioSocketChannel.class)
